@@ -2,6 +2,7 @@ import os
 import openai
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
+from functools import wraps
 
 load_dotenv()  # This line loads the environment variables from the .env file
 app = Flask(__name__)
@@ -17,7 +18,19 @@ PROMPTS = {
 }
 
 
+
+def api_key_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        api_key = request.headers.get("X-API-Key")
+        if not api_key or api_key != os.environ["API_KEY"]:
+            return jsonify({"error": "Invalid or missing API key"}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route("/send_message", methods=["POST"])
+@api_key_required
 def send_message():
     message = request.json.get("message")
     language_code = request.json.get("language_code")
@@ -46,6 +59,8 @@ def send_message():
 @app.route("/")
 def home():
     return "<h1>Welcome to the MealMate API!</h1>"
+
+
 
 
 if __name__ == "__main__":

@@ -4,9 +4,23 @@ from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from functools import wraps
 
+import uuid
+
+# Generate a random UUID (UUID version 4)
+random_uuid = uuid.uuid4()
+
+# Convert the UUID object to a string representation
+uuid_string = str(random_uuid)
+
+
 load_dotenv()  # This line loads the environment variables from the .env file
 app = Flask(__name__)
 openai.api_key = os.environ["OPENAI_API_KEY"]
+
+# supabase config
+url: str = os.environ["SUPABASE_URL"]
+key: str = os.environ["SUPABASE_KEY"]
+supabase: Client = create_client(url, key)
 
 PROMPTS = {
     'en':
@@ -16,7 +30,6 @@ PROMPTS = {
     'zh-hk': "我係一個AI嘅聊天機械人，設計用嚟幫助用戶閱讀粵語餐廳菜單同創建個性化嘅菜單建議。我可以提供點單、食咩同適應個人飲食偏好同限制方面嘅建議。",
     'ja': "私は、英語でレストランのメニューを読んで、ユーザー向けのパーソナライズされたメニュー提案を作成するように設計されたAIチャットボットです。注文すべきものや特定の料理の食べ方、個々の食事の好みや制限に合わせる方法などの提案を提供できます。",
 }
-
 
 
 def api_key_required(f):
@@ -58,9 +71,7 @@ def send_message():
 
 @app.route("/")
 def home():
-    return "<h1>Welcome to the MealMate API!</h1>"
-
-
+    return "<h1>nothing special here</h1>"
 
 
 if __name__ == "__main__":

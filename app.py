@@ -1,8 +1,10 @@
 import os
 import openai
 from flask import Flask, request, jsonify
+
 from dotenv import load_dotenv
 from functools import wraps
+from firebase_admin import credentials, auth
 
 import uuid
 
@@ -17,10 +19,16 @@ load_dotenv()  # This line loads the environment variables from the .env file
 app = Flask(__name__)
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
-# supabase config
-url: str = os.environ["SUPABASE_URL"]
-key: str = os.environ["SUPABASE_KEY"]
-supabase: Client = create_client(url, key)
+# Get the Firebase service account credentials from the environment variable
+firebase_service_account = os.environ.get('FIREBASE_SERVICE_ACCOUNT')
+
+# Convert the service account credentials from a single-line JSON string to a dictionary
+firebase_service_account_dict = json.loads(firebase_service_account)
+
+# Initialize the Firebase app with the service account credentials
+cred = credentials.Certificate(firebase_service_account_dict)
+firebase_app = initialize_app(cred)
+
 
 PROMPTS = {
     'en':
@@ -67,6 +75,48 @@ def send_message():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+def login(email, password):
+    try:
+        user = auth.get_user_by_email(email)
+    except auth.UserNotFoundError:
+        return {"error": "User not found"}
+
+    # You can implement password verification here
+    # Note: Firebase handles password hashing and verification on the client side
+    # So you may need to use the Firebase client SDK for authentication in your Flutter app
+
+    return {"uid": user.uid, "email": user.email}
+
+
+def signup(email, password, display_name):
+    try:
+        user = auth.create_user(
+            email=email, password=password, display_name=display_name)
+        return {"uid": user.uid, "email": user.email}
+    except auth.EmailAlreadyExistsError:
+        return {"error": "Email already in use"}
+
+
+app = Flask(__name__)
+
+
+@app.route("/login", methods=["POST"])
+def login_route():
+    email = request.form.get("email")
+    password = request.form.get("password")
+    result = login(email, password)
+    return jsonify(result)
+
+
+@app.route("/signup", methods=["POST"])
+def signup_route():
+    email = request.form.get("email")
+    password = request.form.get("password")
+    display_name = request.form.get("display_name")
+    result = signup(email, password, display_name)
+    return jsonify(result)
 
 
 @app.route("/")

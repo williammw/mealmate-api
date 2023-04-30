@@ -43,7 +43,7 @@ protobuf==4.23.0rc2
 pyasn1==0.5.0
 pyasn1-modules==0.3.0
 pycparser==2.21
-pycrypto==2.6.1
+pycrypto==
 PyJWT==2.6.0
 pyparsing==3.0.9
 Pyrebase==3.0.18

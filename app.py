@@ -93,15 +93,16 @@ def login():
     password = request.form.get('password')
 
     try:
-        user = firebase_auth.get_user_by_email(email)
-        if user:
-            # Get a custom token for the user
-            custom_token = firebase_auth.create_custom_token(user.uid)
-            # Sign in the user with the custom token and get the ID token
-            id_token = firebase_auth.verify_id_token(custom_token)
-            return jsonify({"status": "success", "user": user.uid, "id_token": id_token}), 200
-        else:
-            return jsonify({"status": "failure", "message": "User not found"}), 404
+        # Verify the email and password provided by the user
+        user = firebase_auth.sign_in_with_email_and_password(email, password)
+
+        # Get a custom token for the user
+        custom_token = firebase_auth.create_custom_token(user['localId'])
+
+        # Sign in the user with the custom token and get the ID token
+        id_token = firebase_auth.verify_id_token(custom_token)
+
+        return jsonify({"status": "success", "user": user['localId'], "id_token": id_token}), 200
     except Exception as e:
         return jsonify({"status": "failure", "message": str(e)}), 400
 
@@ -138,56 +139,60 @@ def home():
     return "<h1>nothing special here</h1>"
 
 
-@app.route('/test_signup', methods=['GET'])
-def test_signup():
-    base_url = "http://127.0.0.1:5000"
+# @app.route('/test_signup', methods=['GET'])
+# def test_signup():
+#     base_url = "http://127.0.0.1:5000"
 
-    signup_data = {
-        "email": "abccde@example.com",
-        "password": "test_password",
-        "display_name": "Test User"
-    }
-    signup_response = requests.post(f"{base_url}/signup", data=signup_data)
-    print("Signup response:", signup_response.json())
-    return jsonify({"status": "success", "message": "Test signup complete"})
-
-
-@app.route('/test_login', methods=['GET'])
-def test_login():
-    base_url = "http://127.0.0.1:5000"
-
-    login_data = {
-        "email": "test_user@example.com",
-        "password": "test_password"
-    }
-    login_response = requests.post(f"{base_url}/login", data=login_data)
-    print("Login response:", login_response.json())
-    id_token = login_response.json().get("id_token")
-
-    return jsonify({"status": "success", "message": "Test login complete", "id_token": id_token})
+#     signup_data = {
+#         "email": "william@xcxcxxc.com",
+#         "password": "1234567z",
+#         "display_name": "Test User"
+#     }
+#     signup_response = requests.post(f"{base_url}/signup", data=signup_data)
+#     print("Signup response:", signup_response.json())
+#     return signup_response.json()
+#     return jsonify({"status": "success", "message": "Test signup complete"})
 
 
-@app.route('/test_logout', methods=['GET'])
-def test_logout():
-    base_url = "http://127.0.0.1:5000"
+# @app.route('/test_login', methods=['GET'])
+# def test_login():
+#     base_url = "http://127.0.0.1:5000"
 
-    # Call the test_login function to get the login response
-    login_response = test_login()
-    # Extract the id_token from the login response
-    id_token = login_response.json.get("id_token")
+#     login_data = {
+#         "email": "william@xcxcxxc.com",
+#         "password": "1234567z",
+#     }
+#     login_response = requests.post(f"{base_url}/login", data=login_data)
+#     return login_response.json()
+#     print("Login response:", login_response.json())
+#     id_token = login_response.json().get("id_token")
 
-    if id_token:
-        logout_data = {
-            "id_token": id_token
-        }
-        logout_response = requests.post(f"{base_url}/logout", data=logout_data)
-        print("Logout response:", logout_response.json())
-        return jsonify({"status": "success", "message": "Test logout complete"})
-    else:
-        return jsonify({"status": "failure", "message": "Test logout skipped due to login failure"})
+#     return jsonify({"status": "success", "message": "Test login complete", "id_token": id_token})
+
+
+# @app.route('/test_logout', methods=['GET'])
+# def test_logout():
+#     base_url = "http://127.0.0.1:5000"
+
+#     # Call the test_login function to get the login response
+#     login_response = test_login()
+#     # Extract the id_token from the login response
+#     id_token = login_response.json.get("id_token")
+
+#     if id_token:
+#         logout_data = {
+#             "id_token": id_token
+#         }
+#         logout_response = requests.post(f"{base_url}/logout", data=logout_data)
+#         print("Logout response:", logout_response.json())
+#         return logout_response.json()
+#         return jsonify({"status": "success", "message": "Test logout complete"})
+#     else:
+#         logout_response.json()
+#         return jsonify({"status": "failure", "message": "Test logout skipped due to login failure"})
 
 
 # test_auth_functions()
-# app = Flask(__name__)
+
 if __name__ == "__main__":
     app.run(debug=True)

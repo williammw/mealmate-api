@@ -126,9 +126,9 @@ def logout():
     id_token = request.form.get('id_token')
 
     try:
-        decoded_token = auth.verify_id_token(id_token)
+        decoded_token = firebase_auth.verify_id_token(id_token)
         uid = decoded_token['uid']
-        auth.revoke_refresh_tokens(uid)
+        firebase_auth.revoke_refresh_tokens(uid)
         return jsonify({"status": "success", "message": "Logout successful"}), 200
     except Exception as e:
         return jsonify({"status": "failure", "message": str(e)}), 400

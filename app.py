@@ -8,7 +8,7 @@ from firebase_admin import credentials, auth, exceptions as firebase_exceptions
 import requests
 import json
 import uuid
-
+from flask import session
 # Generate a random UUID (UUID version 4)
 random_uuid = uuid.uuid4()
 
@@ -73,7 +73,7 @@ def send_message():
         return jsonify({"error": str(e)}), 500
     
 
-from flask import session
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -177,9 +177,10 @@ def is_logged_in():
 #     return logout_response.json()
 
 
+
 @app.route("/")
 def home():
-    return "<h1>nothing special here</h1>"
+    return "<h1>nothing special here 0.0.1</h1>"
 
 
 

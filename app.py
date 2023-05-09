@@ -125,6 +125,22 @@ def signup():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+
+@app.route('/save_user_data', methods=['POST'])
+def save_user_data():
+    email = request.form.get('email')
+    security_code = request.form.get('security_code')
+
+    # Save the user data to Firestore
+    user_ref = db.collection('users').add({
+        'email': email,
+        'security_code': security_code
+    })
+
+    return jsonify({"message": "User data saved successfully"}), 200
+
+
+
 @app.route('/verify_security_code', methods=['POST'])
 def verify_security_code():
     email = request.form.get('email')

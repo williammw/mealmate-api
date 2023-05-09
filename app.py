@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify, session
 
 import firebase_admin
-from firebase_admin import credentials, auth, exceptions as firebase_exceptions
+from firebase_admin import credentials, auth, exceptions as firebase_exceptions, firestore
 import requests
 import json
 import uuid
@@ -36,6 +36,7 @@ firebase_service_account_dict = {
 
 cred = credentials.Certificate(firebase_service_account_dict)
 firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 
 PROMPTS = {
@@ -73,6 +74,90 @@ def send_message():
         return jsonify({"error": str(e)}), 500
     
 
+
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    email = request.form.get('email')
+    password = request.form.get('password')
+    full_name = request.form.get('full_name')
+    username = request.form.get('username')
+    date_of_birth = request.form.get('date_of_birth')
+    people_dining = request.form.get('people_dining')
+
+    try:
+        # Create the user with Firebase Authentication
+        user = auth.create_user(
+            email=email,
+            password=password
+        )
+        
+        # Add the user data to Firestore
+        user_ref = db.collection('users').document(user.uid)
+        user_ref.set({
+            'email': email,
+            'full_name': full_name,
+            'username': username,
+            'date_of_birth': date_of_birth,
+            'people_dining': people_dining
+        })
+
+        # Send a security code to the user (via email or SMS)
+        security_code = generate_security_code()
+        send_security_code(email, security_code)
+
+        # Store the security code in Firestore
+        user_ref.update({
+            'security_code': security_code
+        })
+
+        return jsonify({"message": "User created successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@app.route('/verify_security_code', methods=['POST'])
+def verify_security_code():
+    email = request.form.get('email')
+    user_input_security_code = request.form.get('security_code')
+
+    # Get the user data from Firestore
+    user_ref = db.collection('users').where('email', '==', email).get()
+
+    if user_ref:
+        stored_security_code = user_ref[0].to_dict().get('security_code')
+
+        if user_input_security_code == stored_security_code:
+            # Verification successful
+            return jsonify({"message": "Security code verified successfully"}), 200
+        else:
+            # Verification failed
+            return jsonify({"error": "Invalid security code"}), 400
+    else:
+        return jsonify({"error": "User data not found"}), 404
+
+def generate_security_code():
+    # Implement your code generation logic here
+    pass
+
+def send_security_code(email, security_code):
+    # Implement your email sending logic here
+    pass
+
+
+
+@app.route('/get_user_data', methods=['POST'])
+def get_user_data():
+    email = request.form.get('email')
+
+    # Get the user data from Firestore
+    user_ref = db.collection('users').document(email)
+    user_data = user_ref.get().to_dict()
+
+    if user_data:
+        return jsonify(user_data)
+    else:
+        return jsonify({"error": "User data not found"}), 404
 
 
 @app.route('/login', methods=['POST'])

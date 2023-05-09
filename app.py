@@ -1,7 +1,7 @@
 import os
 import openai
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session,url_for, redirect
 
 import firebase_admin
 from firebase_admin import credentials, auth, exceptions as firebase_exceptions, firestore
@@ -75,43 +75,52 @@ def send_message():
     
 
 
-
 @app.route('/signup', methods=['POST'])
 def signup():
-    email = request.form.get('email')
-    password = request.form.get('password')
+    email_or_phone = request.form.get('email_or_phone')
     full_name = request.form.get('full_name')
     username = request.form.get('username')
+    password = request.form.get('password')
     date_of_birth = request.form.get('date_of_birth')
     people_dining = request.form.get('people_dining')
 
     try:
         # Create the user with Firebase Authentication
-        user = auth.create_user(
-            email=email,
-            password=password
-        )
+        if '@' in email_or_phone:
+            user = auth.create_user(
+                email=email_or_phone,
+                password=password
+            )
+        else:
+            user = auth.create_user(
+                phone_number=email_or_phone,
+                password=password
+            )
         
         # Add the user data to Firestore
         user_ref = db.collection('users').document(user.uid)
         user_ref.set({
-            'email': email,
+            'email_or_phone': email_or_phone,
             'full_name': full_name,
             'username': username,
             'date_of_birth': date_of_birth,
-            'people_dining': people_dining
+            'people_dining': people_dining,
+            'bio': '',
         })
 
         # Send a security code to the user (via email or SMS)
         security_code = generate_security_code()
-        send_security_code(email, security_code)
+        if '@' in email_or_phone:
+            send_security_code(email_or_phone, security_code, method="email")
+        else:
+            send_security_code(email_or_phone, security_code, method="sms")
 
         # Store the security code in Firestore
         user_ref.update({
             'security_code': security_code
         })
 
-        return jsonify({"message": "User created successfully"}), 200
+        return jsonify({"message": "User created successfully", "user_id": user.uid, "email_or_phone": email_or_phone}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400
@@ -143,8 +152,6 @@ def generate_security_code():
 def send_security_code(email, security_code):
     # Implement your email sending logic here
     pass
-
-
 
 @app.route('/get_user_data', methods=['POST'])
 def get_user_data():
@@ -192,28 +199,6 @@ def logout():
     else:
         return jsonify({"status": "failure", "message": "No user logged in"}), 400
 
-
-# @app.route('/test_login', methods=['GET'])
-# def test_login():
-#     base_url = "http://127.0.0.1:5000"
-
-#     login_data = {
-#         "email": "a@a.com",
-#         "password": "1234567z",
-#     }
-#     headers = {'Content-type': 'application/json'}
-
-#     login_response = requests.post(f"{base_url}/login", json=login_data, headers=headers)
-#     return login_response.json()
-
-# def verify_id_token(id_token):
-#     try:
-#         decoded_token = auth.verify_id_token(id_token)
-#         return decoded_token
-#     except Exception as e:
-#         print(f"Error verifying ID token: {str(e)}")
-#         return None
-
 @app.route('/is_logged_in', methods=['POST'])
 def is_logged_in():
     id_token = request.json.get("idToken")
@@ -227,40 +212,6 @@ def is_logged_in():
         return jsonify({"status": "success", "message": "User is logged in", "user": decoded_token["uid"]}), 200
     else:
         return jsonify({"status": "failure", "message": "User is not logged in"}), 401
-
-# Update test_logout function
-# @app.route('/test_logout', methods=['GET'])
-# def test_logout():
-#     base_url = "http://127.0.0.1:5000"
-
-#     login_data = {
-#         "email": "a@a.com",
-#         "password": "1234567z",
-#     }
-#     headers = {'Content-type': 'application/json'}
-
-#     login_response = requests.post(f"{base_url}/login", json=login_data, headers=headers)
-#     print(f"Login Response: {login_response.json()}")  # Added print statement
-
-#     id_token = login_response.json().get("idToken")
-
-#     if not id_token:
-#         return jsonify({"status": "failure", "message": "Login failed"}), 400
-
-#     is_logged_in_data = {
-#         "idToken": id_token,
-#     }
-
-#     is_logged_in_response = requests.post(f"{base_url}/is_logged_in", json=is_logged_in_data, headers=headers)
-#     print(f"Is Logged In Response: {is_logged_in_response.json()}")
-
-#     logout_data = {
-#         "idToken": id_token,
-#     }
-
-#     logout_response = requests.post(f"{base_url}/logout", json=logout_data, headers=headers)
-#     return logout_response.json()
-
 
 
 @app.route("/")

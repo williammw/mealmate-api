@@ -290,12 +290,23 @@ def get_chats():
     return jsonify(user_chats), 200
 
 
+
+@app.route('/get_user_chats', methods=['GET'])
+def get_user_chats():
+    user_id = request.args.get('user_id')
+    chats_ref = db.collection('chats')
+    user_chats = chats_ref.where('user_id', '==', user_id).stream()
+    user_chats_list = [chat.to_dict() for chat in user_chats]
+    return jsonify({'success': True, 'chats': user_chats_list})
+
+
 chats = []  # This will store the chat data
 
-def create_chat():
+def create_chat(user_id):
     chat_id = str(uuid.uuid4())
     chat_data = {
         'id': chat_id,
+        'user_id': user_id,
         'messages': [],
         'timestamp': datetime.utcnow().isoformat(),
     }
@@ -306,7 +317,8 @@ def create_chat():
 
 @app.route('/create_new_chat', methods=['POST'])
 def create_new_chat():
-    chat_data = create_chat()
+    user_id = request.json['user_id']
+    chat_data = create_chat(user_id)
     return jsonify({'success': True, 'message': 'New chat created', 'chat': chat_data})
 
 

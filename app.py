@@ -288,6 +288,15 @@ def get_chats():
 
     return jsonify(user_chats), 200
 
+@app.route('/create_new_chat', methods=['POST'])
+def create_new_chat():
+    # Your new chat creation logic here
+    # You can access the request data using request.json or request.form
+
+    # Return the result as JSON
+    return jsonify({'success': True, 'message': 'New chat created'})
+
+
 @app.route("/")
 def home():
     return "<h1>nothing special here 0.0.2</h1>"

@@ -2,6 +2,7 @@ import os
 import openai
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, session,url_for, redirect
+from datetime import datetime
 
 import firebase_admin
 from firebase_admin import credentials, auth, exceptions as firebase_exceptions, firestore
@@ -288,11 +289,25 @@ def get_chats():
 
     return jsonify(user_chats), 200
 
+
+chats = []  # This will store the chat data
+
+def create_chat():
+    chat_id = str(uuid.uuid4())
+    chat_data = {
+        'id': chat_id,
+        'messages': [],
+        'timestamp': datetime.utcnow().isoformat(),
+    }
+    chats.append(chat_data)
+    return chat_data
+
+
 @app.route('/create_new_chat', methods=['POST'])
 def create_new_chat():
     # Your new chat creation logic here
     # You can access the request data using request.json or request.form
-
+    chat_data = create_chat()
     # Return the result as JSON
     return jsonify({'success': True, 'message': 'New chat created'})
 

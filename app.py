@@ -78,6 +78,7 @@ def send_message():
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.json
+    print(f'Request data: {data}')
     email_or_phone = data.get('email_or_phone')
     full_name = data.get('full_name')
     username = data.get('username')

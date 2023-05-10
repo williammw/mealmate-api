@@ -77,12 +77,13 @@ def send_message():
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    email_or_phone = request.form.get('email_or_phone')
-    full_name = request.form.get('full_name')
-    username = request.form.get('username')
-    password = request.form.get('password')
-    date_of_birth = request.form.get('date_of_birth')
-    people_dining = request.form.get('people_dining')
+    data = request.json
+    email_or_phone = data.get('email_or_phone')
+    full_name = data.get('full_name')
+    username = data.get('username')
+    password = data.get('password')
+    date_of_birth = data.get('date_of_birth')
+    people_dining = data.get('people_dining')
 
     try:
         # Create the user with Firebase Authentication

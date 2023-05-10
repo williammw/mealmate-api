@@ -299,17 +299,15 @@ def create_chat():
         'messages': [],
         'timestamp': datetime.utcnow().isoformat(),
     }
-    chats.append(chat_data)
+    db.collection('chats').document(chat_id).set(chat_data)
     return chat_data
+
 
 
 @app.route('/create_new_chat', methods=['POST'])
 def create_new_chat():
-    # Your new chat creation logic here
-    # You can access the request data using request.json or request.form
     chat_data = create_chat()
-    # Return the result as JSON
-    return jsonify({'success': True, 'message': 'New chat created'})
+    return jsonify({'success': True, 'message': 'New chat created', 'chat': chat_data})
 
 
 @app.route("/")

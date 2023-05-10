@@ -9,6 +9,9 @@ import requests
 import json
 import uuid
 from flask import session
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from twilio.rest import Client as TwilioClient
 # Generate a random UUID (UUID version 4)
 random_uuid = uuid.uuid4()
 
@@ -20,6 +23,10 @@ load_dotenv()  # This line loads the environment variables from the .env file
 app = Flask(__name__)
 openai.api_key = os.environ["OPENAI_API_KEY"]
 app.secret_key = os.environ["FLASK_SECRET_KEY"]
+
+sendgrid_api_key = os.environ["SENDGRID_API_KEY"]
+twilio_account_sid = os.environ["TWILIO_ACCOUNT_SID"]
+twilio_auth_token = os.environ["TWILIO_AUTH_TOKEN"]
 
 firebase_service_account_dict = {
     "type": os.environ.get("FIREBASE_TYPE"),
@@ -172,9 +179,36 @@ def generate_security_code():
     # Implement your code generation logic here
     pass
 
-def send_security_code(email, security_code):
-    # Implement your email sending logic here
-    pass
+def send_security_code(recipient, security_code, method=None):
+    
+    if method == "email":
+        message = Mail(
+            from_email="noreply@yourdomain.com",
+            to_emails=recipient,
+            subject="Your security code",
+            plain_text_content=f"Your security code is: {security_code}",
+        )
+        try:
+            sg = SendGridAPIClient(sendgrid_api_key)
+            response = sg.send(message)
+            print("Email sent successfully.")
+        except Exception as e:
+            print("Error sending email:", e)
+
+    elif method == "sms":
+        try:
+            twilio_client = TwilioClient(twilio_account_sid, twilio_auth_token)
+            message = twilio_client.messages.create(
+                body=f"Your security code is: {security_code}",
+                from_="+1234567890",  # Replace with your Twilio phone number
+                to=recipient,
+            )
+            print("SMS sent successfully.")
+        except Exception as e:
+            print("Error sending SMS:", e)
+    else:
+        print("Invalid method specified.")
+
 
 @app.route('/get_user_data', methods=['POST'])
 def get_user_data():
@@ -237,9 +271,26 @@ def is_logged_in():
         return jsonify({"status": "failure", "message": "User is not logged in"}), 401
 
 
+@app.route('/get_chats', methods=['POST'])
+def get_chats():
+    user_id = request.form.get('user_id')
+
+    if not user_id:
+        return jsonify({"error": "Missing user_id"}), 400
+
+    user_chats = []
+    chat_refs = db.collection('chats').where('user_id', '==', user_id).get()
+
+    for chat_ref in chat_refs:
+        chat_data = chat_ref.to_dict()
+        chat_data['chat_id'] = chat_ref.id
+        user_chats.append(chat_data)
+
+    return jsonify(user_chats), 200
+
 @app.route("/")
 def home():
-    return "<h1>nothing special here 0.0.1</h1>"
+    return "<h1>nothing special here 0.0.2</h1>"
 
 
 

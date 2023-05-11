@@ -3,6 +3,8 @@ import openai
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, session,url_for, redirect
 from datetime import datetime
+from google.cloud import firestore
+from google.oauth2.service_account import Credentials
 
 import firebase_admin
 from firebase_admin import credentials, auth, exceptions as firebase_exceptions, firestore
@@ -42,9 +44,14 @@ firebase_service_account_dict = {
     "client_x509_cert_url": os.environ.get("FIREBASE_CLIENT_X509_CERT_URL"),
 }
 
-cred = credentials.Certificate(firebase_service_account_dict)
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+# cred = credentials.Certificate(firebase_service_account_dict)
+# firebase_admin.initialize_app(cred)
+# db = firestore.client()
+
+
+credentials_info = json.loads(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
+credentials = Credentials.from_service_account_info(credentials_info)
+db = firestore.Client(credentials=credentials)
 
 
 PROMPTS = {

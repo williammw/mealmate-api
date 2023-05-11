@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "mealmate-b3b1e",
+  "private_key_id": "ebfd113a2e1fb626f646061309f97bda37a0440d",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCiLHgxv+eljOeq\nXypFaPoRy+uO3klM6BF3aRvRaKfsWnsZLbndZc1e43CyT5ybQPmUJDv6bUsdxtny\nwXh6RL/RLyvDI2mW+FJ0Vu6cSbbFFWEWYLTqaAECm6nliaGQcKb7RAY9XjCNadeT\nCHHolw56O7EYw6HwTtzcv7KOSdB9h9X6BC97gpdtNma/TI87L1Tra71ooVbqnHcA\nTE6zCIG8q6bYo8cPYapdPX/UXQpVrFu+7mRyesiBUChtvL5+hTfdZ+/kwGeI97/T\nvRJxSCn5Kd/qLGj4j2V8iSYsZgkKNiq/T/Fy5wdeH4+9yTZC+C942ko3NpddfVVW\n0aInmKLpAgMBAAECggEADwR+MYvbUtBxstcILjryjqEAabpPiwshyZnWpSAuDgGH\nolptJUGO8Ila6hrcM4ujRk11WRMziwjbLZMulGf3DqhxwtVt1Y3zmL66GYfr9bkt\nRJS6UXXwbgI7NpHK/89RbzV/5xaTTsJtNOTpzhzljs/QmQH4u4JEtT5yivbukx58\n0N77OlydYmNTIB0oYrajwiKasijUeWZgKm1BdjkWKzv1Tf6BL+efDv8Iw2rTfsht\nd0Rio9jOYQ/PgtLtvym7+tYzCHOBek7SlOz1/mcDgJIe2aTBT5TH4ZzA7Rzk6s5s\nxn0hk3cJ7orZBKJ5wfakqtSlEyx10sqGWdOJklqevwKBgQDO4tOOyJGVV6Jo52pO\nvRHrsGznhWNXUX5Bn9/4feNtCxj4zgpsBw1HhanGgJ0Hg2Q6IXYOd2IPg03EEtaQ\nZXqL4F1hxta8pyfRgl7p2F0e8UOftOumJ2FWVSNd/TGKnGv3U0bs7E11lfoWRo8+\nrg8TLG1JNb+VOhirIyFW2deHCwKBgQDIrFJOdNAaLXOk1VHeElnaY1snCwwq/pSy\ncVd/A2UyNUFM+VG28g0ZTG7xlj9SfGalpVm3EZUNwckVbO2Chc+IWueBvKUPbrfQ\naCbW3fT3kvMbFxLlb1jluIy6pHA+k6tpOs/ZrZmaGG3vUWjtlkHxHlsqJDxsdprm\nGcPZo9AmWwKBgQDCurGSdarCPOg7gYaIcmIJy9fV27FzoNsL/eWcSTHlk0p/9b/N\nip2vMlpo4unrBnsyVAiA+VGtdFOgOHMJGttMCXUb8UJx84wBIYsg5GxSEZkrG+mq\nTOrLjftqHkWhSDY/Z30cyBbolK/+g4+U2dSKoYiEHjkjxrktbDWXQBgjnQKBgQCH\nev/ehDLzWXhX8sVg3pbXQHkL9QN0C4isqKTf1ZT+vsGljDXFA8ogKGBGrp91uxM6\nBlZ5qF8veIOf+XioxFqGvojKKGhv8Noc1BRUwGlgtE95HKzfRbuI7H3mjJpTRTNW\nyiQF3JR1WsTt69KhhO5kMZBu9SPuPmz5qK93QoeHPQKBgDh8wmrjKAPa0zGfix/A\nBd7ght+TVSr7T6eilNt9ucCVmdgwb25v/ttFSsAaCkCBaTFFFPHlyRbFijnkdZQi\ndQs6fsG6/5zKhvW9TG1LDa/OykZTOzjwIVYGcjPzn6QOCXFRpT3mngB26Jofim2z\nUUScjIW4X9XhpbIlIT/IgW72\n-----END PRIVATE KEY-----\n",
+  "client_email": "mealmate-api-endpoint@mealmate-b3b1e.iam.gserviceaccount.com",
+  "client_id": "108596413043257164785",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/mealmate-api-endpoint%40mealmate-b3b1e.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

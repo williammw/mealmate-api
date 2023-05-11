@@ -347,7 +347,7 @@ def store_message():
 
 @app.route("/")
 def home():
-    return "<h1>nothing special here 0.0.3</h1>"
+    return "<h1>nothing special here 0.0.4</h1>"
 
 
 

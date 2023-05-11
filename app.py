@@ -333,11 +333,24 @@ def store_message():
         return jsonify({"error": "Missing user_id or message"}), 400
 
     db = firestore.Client()
-    doc_ref = db.collection('messages').document()
 
+    # Fetch the document that matches the user_id
+    docs = db.collection('messages').where('user_id', '==', message_data['user_id']).stream()
+
+    # If the document exists, update it with the new message
+    for doc in docs:
+        doc_ref = db.collection('messages').document(doc.id)
+        doc_ref.update({
+            'messages': firestore.ArrayUnion([message_data['message']]),
+            'timestamp': firestore.SERVER_TIMESTAMP
+        })
+        return jsonify({"message": "Message stored successfully"}), 200
+
+    # If the document does not exist, create a new one
+    doc_ref = db.collection('messages').document()
     doc_ref.set({
         'user_id': message_data['user_id'],
-        'message': message_data['message'],
+        'messages': [message_data['message']],
         'timestamp': firestore.SERVER_TIMESTAMP
     })
 

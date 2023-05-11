@@ -1,21 +1,28 @@
+import unittest
 import requests
+import json
 
-def test_signup():
-    url = 'http://127.0.0.1:5000/signup'  # Replace with your Flask app's address and port
-    data = {
-        'email': 'iamx@ddd.com',
-        'password': '1234567z',
-        'full_name': 'Peter Doe',
-        'username': 'Peterdoe',
-        'display_name': 'Slut FUck 1999',
-        'date_of_birth': '1986-01-01',
-        'people_dining': 4,
-        'bio': 'lun dui HK ',
-    }
+class TestStoreMessage(unittest.TestCase):
+    BASE_URL = 'http://localhost:5000'  # Change this to your Flask app's URL
 
-    response = requests.post(url, data=data)
-    print(response.status_code)
-    print(response.text)
+    def test_store_message(self):
+        # Define the data to send
+        data = {
+            'user_id': 'qJ2WatatTYdF4eByAmXGWJfLAq33',
+            'message': 'test_message'
+        }
+
+        # Send a POST request to the /store_message endpoint
+        response = requests.post(f'{self.BASE_URL}/store_message', json=data)
+
+        # Check the status code
+        self.assertEqual(response.status_code, 200)
+
+        # Check the response data
+        response_data = response.json()
+        self.assertEqual(response_data, {"message": "Message stored successfully"})
+
+
 
 if __name__ == '__main__':
-    test_signup()
+    unittest.main()

@@ -44,15 +44,10 @@ firebase_service_account_dict = {
     "client_x509_cert_url": os.environ.get("FIREBASE_CLIENT_X509_CERT_URL"),
 }
 
-# cred = credentials.Certificate(firebase_service_account_dict)
-# firebase_admin.initialize_app(cred)
-# db = firestore.client()
+cred = credentials.Certificate(firebase_service_account_dict)
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
-
-credentials_info = json.loads(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
-credentials = Credentials.from_service_account_info(credentials_info)
-db = firestore.Client(credentials=credentials)
-    
 
 PROMPTS = {
     'en':
@@ -329,12 +324,15 @@ def create_new_chat():
     chat_data = create_chat(user_id)
     return jsonify({'success': True, 'message': 'New chat created', 'chat': chat_data})
 
-
 @app.route('/store_message', methods=['POST'])
 def store_message():
-    db = firestore.Client()
+    message_data = request.get_json()
 
-    message_data = request.json
+    # Check if user_id and message are in the posted data
+    if 'user_id' not in message_data or 'message' not in message_data:
+        return jsonify({"error": "Missing user_id or message"}), 400
+
+    db = firestore.Client()
     doc_ref = db.collection('messages').document()
 
     doc_ref.set({
@@ -343,15 +341,14 @@ def store_message():
         'timestamp': firestore.SERVER_TIMESTAMP
     })
 
-    return {'message': 'Message stored successfully'}, 200
+    return jsonify({"message": "Message stored successfully"}), 200
+
 
 @app.route("/")
 def home():
-    return "<h1>nothing special here 0.0.4</h1>"
+    return "<h1>MealMate(temp) 0.0.6</h1>"
 
-@app.route("/home")
-def test():
-     return "<h1>test</h1>"
+
 
 if __name__ == "__main__":
     app.run(debug=True)

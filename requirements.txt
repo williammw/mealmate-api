@@ -21,6 +21,7 @@ google-api-python-client==2.86.0
 google-auth==2.17.3
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==1.0.0
+google-cloud==0.34.0
 google-cloud-core==2.3.2
 google-cloud-firestore==2.11.1
 google-cloud-storage==2.9.0
@@ -50,6 +51,7 @@ pycparser==2.21
 pycryptodome==3.4.3
 PyJWT==2.6.0
 pyparsing==3.0.9
+python-decouple==3.8
 python-dotenv==1.0.0
 python-http-client==3.3.7
 python-jwt==2.0.1

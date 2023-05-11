@@ -3,9 +3,6 @@ import openai
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, session,url_for, redirect
 from datetime import datetime
-from google.cloud import firestore
-from google.oauth2.service_account import Credentials
-
 import firebase_admin
 from firebase_admin import credentials, auth, exceptions as firebase_exceptions, firestore
 import requests
@@ -43,14 +40,10 @@ firebase_service_account_dict = {
     "auth_provider_x509_cert_url": os.environ.get("FIREBASE_AUTH_PROVIDER_X509_CERT_URL"),
     "client_x509_cert_url": os.environ.get("FIREBASE_CLIENT_X509_CERT_URL"),
 }
-# Use the dictionary to create a Credentials object
-creds = Credentials.from_service_account_info(firebase_service_account_dict)
+cred = credentials.Certificate(firebase_service_account_dict)
+firebase_admin.initialize_app(cred)
 
-# Initialize the Firebase Admin SDK
-firebase_admin.initialize_app(creds)
-
-# Use the credentials to authenticate the Firestore client
-db = firestore.Client(credentials=creds)
+db = firestore.client()
 
 
 PROMPTS = {

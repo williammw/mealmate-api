@@ -52,7 +52,7 @@ firebase_service_account_dict = {
 credentials_info = json.loads(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
 credentials = Credentials.from_service_account_info(credentials_info)
 db = firestore.Client(credentials=credentials)
-
+    
 
 PROMPTS = {
     'en':
@@ -347,7 +347,7 @@ def store_message():
 
 @app.route("/")
 def home():
-    return "<h1>nothing special here 0.0.2</h1>"
+    return "<h1>nothing special here 0.0.3</h1>"
 
 
 

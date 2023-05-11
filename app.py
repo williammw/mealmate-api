@@ -43,10 +43,14 @@ firebase_service_account_dict = {
     "auth_provider_x509_cert_url": os.environ.get("FIREBASE_AUTH_PROVIDER_X509_CERT_URL"),
     "client_x509_cert_url": os.environ.get("FIREBASE_CLIENT_X509_CERT_URL"),
 }
+# Use the dictionary to create a Credentials object
+creds = Credentials.from_service_account_info(firebase_service_account_dict)
 
-cred = credentials.Certificate(firebase_service_account_dict)
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+# Initialize the Firebase Admin SDK
+firebase_admin.initialize_app(creds)
+
+# Use the credentials to authenticate the Firestore client
+db = firestore.Client(credentials=creds)
 
 
 PROMPTS = {
@@ -360,7 +364,7 @@ def store_message():
 
 @app.route("/")
 def home():
-    return "<h1>MealMate(temp) 0.0.6</h1>"
+    return "<h1>MealMate(temp) 0.0.7</h1>"
 
 
 

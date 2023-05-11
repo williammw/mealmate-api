@@ -349,7 +349,9 @@ def store_message():
 def home():
     return "<h1>nothing special here 0.0.4</h1>"
 
-
+@app.route("/home")
+def test():
+     return "<h1>test</h1>"
 
 if __name__ == "__main__":
     app.run(debug=True)

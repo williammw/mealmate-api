@@ -17,7 +17,7 @@ random_uuid = uuid.uuid4()
 
 # Convert the UUID object to a string representation
 uuid_string = str(random_uuid)
-
+print(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"))
 
 load_dotenv()  # This line loads the environment variables from the .env file
 app = Flask(__name__)
@@ -41,7 +41,8 @@ firebase_service_account_dict = {
     "client_x509_cert_url": os.environ.get("FIREBASE_CLIENT_X509_CERT_URL"),
 }
 cred = credentials.Certificate(firebase_service_account_dict)
-firebase_admin.initialize_app(cred)
+default_app = firebase_admin.initialize_app(cred)
+print(default_app.name)  # "[DEFAULT]"
 
 db = firestore.client()
 

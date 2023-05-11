@@ -40,7 +40,7 @@ firebase_service_account_dict = {
     "auth_provider_x509_cert_url": os.environ.get("FIREBASE_AUTH_PROVIDER_X509_CERT_URL"),
     "client_x509_cert_url": os.environ.get("FIREBASE_CLIENT_X509_CERT_URL"),
 }
-cred = credentials.Certificate('../happy.json')
+cred = credentials.Certificate(firebase_service_account_dict)
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()

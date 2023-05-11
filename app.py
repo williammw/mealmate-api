@@ -326,6 +326,7 @@ def create_new_chat():
 
 @app.route('/store_message', methods=['POST'])
 def store_message():
+    print('/store_message')
     message_data = request.get_json()
 
     # Check if user_id and message are in the posted data

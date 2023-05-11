@@ -315,12 +315,28 @@ def create_chat(user_id):
 
 
 
+
 @app.route('/create_new_chat', methods=['POST'])
 def create_new_chat():
     user_id = request.json['user_id']
     chat_data = create_chat(user_id)
     return jsonify({'success': True, 'message': 'New chat created', 'chat': chat_data})
 
+
+@app.route('/store_message', methods=['POST'])
+def store_message():
+    db = firestore.Client()
+
+    message_data = request.json
+    doc_ref = db.collection('messages').document()
+
+    doc_ref.set({
+        'user_id': message_data['user_id'],
+        'message': message_data['message'],
+        'timestamp': firestore.SERVER_TIMESTAMP
+    })
+
+    return {'message': 'Message stored successfully'}, 200
 
 @app.route("/")
 def home():

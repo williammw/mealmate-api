@@ -41,6 +41,10 @@ firebase_service_account_dict = {
     "auth_provider_x509_cert_url": os.environ.get("FIREBASE_AUTH_PROVIDER_X509_CERT_URL"),
     "client_x509_cert_url": os.environ.get("FIREBASE_CLIENT_X509_CERT_URL"),
 }
+# just 9copy from stackoverflow
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(os.getcwd(), "mealmate-b3b1e-ebfd113a2e1f.json")
+print("GOOGLE_APPLICATION_CREDENTIALS: ", os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
+
 cred = credentials.Certificate(firebase_service_account_dict)
 default_app = firebase_admin.initialize_app(cred)
 
@@ -363,7 +367,7 @@ def store_message():
 
 @app.route("/")
 def home():
-    return "<h1>MealMate(temp) 0.0.8</h1>"
+    return "<h1>MealMate(temp) 0.0.9</h1>"
 
 
 

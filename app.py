@@ -3,6 +3,7 @@ import openai
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, session,url_for, redirect
 from datetime import datetime
+
 import firebase_admin
 from firebase_admin import credentials, auth, exceptions as firebase_exceptions, firestore
 import requests
@@ -42,7 +43,11 @@ firebase_service_account_dict = {
 }
 cred = credentials.Certificate(firebase_service_account_dict)
 default_app = firebase_admin.initialize_app(cred)
-print(default_app.name)  # "[DEFAULT]"
+
+print("Current Working Directory: ", os.getcwd())
+print("Files in Current Directory: ", os.listdir())
+print("GOOGLE_APPLICATION_CREDENTIALS: ", os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
+print("DEFAULT APP NAME",default_app.name) 
 
 db = firestore.client()
 
@@ -358,7 +363,7 @@ def store_message():
 
 @app.route("/")
 def home():
-    return "<h1>MealMate(temp) 0.0.7</h1>"
+    return "<h1>MealMate(temp) 0.0.8</h1>"
 
 
 

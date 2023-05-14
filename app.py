@@ -18,7 +18,7 @@ random_uuid = uuid.uuid4()
 
 # Convert the UUID object to a string representation
 uuid_string = str(random_uuid)
-print(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"))
+# print(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"))
 
 load_dotenv()  # This line loads the environment variables from the .env file
 app = Flask(__name__)
@@ -43,7 +43,7 @@ firebase_service_account_dict = {
 }
 # just 9copy from stackoverflow
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(os.getcwd(), "mealmate-b3b1e-ebfd113a2e1f.json")
-print("GOOGLE_APPLICATION_CREDENTIALS: ", os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
+# print("GOOGLE_APPLICATION_CREDENTIALS: ", os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
 
 cred = credentials.Certificate(firebase_service_account_dict)
 default_app = firebase_admin.initialize_app(cred)
@@ -66,7 +66,32 @@ PROMPTS = {
 }
 
 
-    
+
+DEFAULT_MESSAGES = {
+    'en': 'Hello! I\'m your restaurant chatbot, powered by OpenAI GPT-3.5. '
+        'I can help you find the best restaurants nearby, recommend dishes, '
+        'and answer any questions you might have about dining. Just type your '
+        'question or request, and I\'ll do my best to assist you. Let\'s get started!',
+    'zh-cn': '您好！我是您的餐厅聊天机器人，我可以帮助您找到附近最好的餐厅，推荐菜肴，'
+        '并回答您可能对餐饮有的任何问题。只需要输入您的问题或请求，我将尽我所能为您提供帮助。让我们开始吧！',
+    'zh-tw': '您好！我是您的餐廳聊天機器人，我可以幫助您找到附近最好的餐廳，推薦菜餚，'
+        '並回答您可能對餐飲有的任何問題。只需要輸入您的問題或請求，我將盡我所能為您提供幫助。讓我們開始吧！',
+    'zh-hk': '您好！我是您的餐廳聊天機器人，我可以幫助您找到附近最好的餐廳，推薦菜餚，'
+        '並回答您可能對餐飲有的任何問題。只需要輸入您的問題或請求，我將盡我所能為您提供幫助。讓我們開始吧！',
+    'ja': 'こんにちは！私はあなたのレストランチャットボットで、'
+        '近くの最高のレストランを見つけること、料理をお勧めすること、ダイニングに関するあなたが持っているかもしれない質問に答えることができます。'
+        'あなたの質問やリクエストを入力するだけで、私はあなたを最善にサポートします。始めましょう！'
+}
+
+@app.route('/get_default_message', methods=['POST'])
+def get_default_message():
+    data = request.json
+    language_code = data.get('language_code', 'en')  # default to English if no language code is provided
+    default_message = DEFAULT_MESSAGES.get(language_code, DEFAULT_MESSAGES['en'])  # default to English message if no message for the requested language
+
+
+
+
 @app.route("/send_message", methods=["POST"])
 def send_message():
     message = request.json.get("message")

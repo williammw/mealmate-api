@@ -85,9 +85,18 @@ DEFAULT_MESSAGES = {
 
 @app.route('/get_default_message', methods=['POST'])
 def get_default_message():
-    data = request.json
-    language_code = data.get('language_code', 'en')  # default to English if no language code is provided
-    default_message = DEFAULT_MESSAGES.get(language_code, DEFAULT_MESSAGES['en'])  # default to English message if no message for the requested language
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "Invalid JSON data"}), 400
+
+        language_code = data.get('language_code', 'en')  # default to English if no language code is provided
+        default_message = DEFAULT_MESSAGES.get(language_code, DEFAULT_MESSAGES['en'])  # default to English message if no message for the requested language
+        
+        return jsonify({"default_message": default_message}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 

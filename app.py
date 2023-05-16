@@ -365,6 +365,7 @@ def create_new_chat():
     chat_data = create_chat(user_id)
     return jsonify({'success': True, 'message': 'New chat created', 'chat': chat_data})
 
+
 @app.route('/store_message', methods=['POST'])
 def store_message():
     print('/store_message')

@@ -370,30 +370,40 @@ def store_message():
     print('/store_message')
     message_data = request.get_json()
 
-    # Check if user_id and message are in the posted data
-    if 'user_id' not in message_data or 'message' not in message_data:
-        return jsonify({"error": "Missing user_id or message"}), 400
+    required_fields = ['id', 'chatId', 'senderId', 'content', 'type', 'status', 'timestamp']
+    if not all(field in message_data for field in required_fields):
+        return jsonify({"error": "Missing one or more required fields"}), 400
 
     db = firestore.Client()
 
-    # Fetch the document that matches the user_id
-    docs = db.collection('messages').where('user_id', '==', message_data['user_id']).stream()
+    # Fetch the document that matches the id
+    docs = db.collection('messages').where('id', '==', message_data['id']).stream()
 
     # If the document exists, update it with the new message
     for doc in docs:
         doc_ref = db.collection('messages').document(doc.id)
         doc_ref.update({
-            'messages': firestore.ArrayUnion([message_data['message']]),
-            'timestamp': firestore.SERVER_TIMESTAMP
+            'chatId': message_data['chatId'],
+            'senderId': message_data['senderId'],
+            'content': message_data['content'],
+            'type': message_data['type'],
+            'status': message_data['status'],
+            'attachments': message_data.get('attachments', []),
+            'timestamp': message_data['timestamp']
         })
-        return jsonify({"message": "Message stored successfully"}), 200
+        return jsonify({"message": "Message updated successfully"}), 200
 
     # If the document does not exist, create a new one
     doc_ref = db.collection('messages').document()
     doc_ref.set({
-        'user_id': message_data['user_id'],
-        'messages': [message_data['message']],
-        'timestamp': firestore.SERVER_TIMESTAMP
+        'id': message_data['id'],
+        'chatId': message_data['chatId'],
+        'senderId': message_data['senderId'],
+        'content': message_data['content'],
+        'type': message_data['type'],
+        'status': message_data['status'],
+        'attachments': message_data.get('attachments', []),
+        'timestamp': message_data['timestamp']
     })
 
     return jsonify({"message": "Message stored successfully"}), 200

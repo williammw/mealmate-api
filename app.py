@@ -408,55 +408,10 @@ def store_message():
 
     return jsonify({"message": "Message stored successfully"}), 200
 
-@app.route('/add_message', methods=['POST'])
-def add_message():
-    message_data = request.json['message']
-    # Convert the message data to your Message model
 
-    # Add the message to Firebase
-    doc_ref = db.collection(u'users').document(message_data['sender']['uid']).collection(u'chats').document(message_data['chatId'])
-    doc_ref.set({
-        u'messages': {
-            message_data['id']: {
-                u'createdAt': message_data['timestamp'],
-                u'updatedAt': message_data['timestamp'],
-                u'type': message_data['type'],
-                u'content': message_data['content'],
-                u'sender': message_data['sender']['displayName'],
-                u'processed': False,
-            }
-        }
-    }, merge=True)
 
-    return '', 200
 
-# this is old one; will be removed soon
-@app.route('/addMessage', methods=['POST'])
-def add_message():
-    try:
-        id = request.json['id']
-        chat_data = request.json['chat_data']
-        
-        db.collection('users').document(id).collection('chats').add(chat_data)
-        
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        return f"An Error Occured: {e}"
 
-@app.route('/getMessages', methods=['GET'])
-def get_messages():
-    try:
-        id = request.args.get('id')
-        
-        user_ref = db.collection('users').document(id)
-        chats = user_ref.collection('chats').stream()
-
-        for chat in chats:
-            print(chat.to_dict())
-        
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        return f"An Error Occured: {e}"
 
 
 

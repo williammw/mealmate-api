@@ -411,6 +411,13 @@ def store_message():
 
 
 
+@app.route('/get_messages_for_chat', methods=['POST'])
+def get_messages_for_chat():
+    data = request.get_json()
+    chat_id = data['chat_id']
+    limit = data['limit']
+    messages = Message.query.filter_by(chat_id=chat_id).order_by(Message.createdAt.desc()).limit(limit).all()
+    return jsonify([message.to_dict() for message in messages])
 
 
 

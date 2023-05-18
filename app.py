@@ -268,6 +268,34 @@ def get_user_data():
         return jsonify({"error": "User data not found"}), 404
 
 
+
+
+
+# Mock database for users
+users = {
+    "user1": {
+        "uid": "user1",
+        "email": "user1@example.com",
+        "displayName": "User One",
+        "photoURL": "https://example.com/user1.jpg",
+        "createdAt": "2023-05-01T00:00:00Z"
+    },
+    # Other users...
+}
+
+# get_user_details
+@app.route('/get_user_details', methods=['GET'])
+def get_user_details():
+    # Get user ID from query parameters
+    uid = request.args.get('uid')
+
+    if uid in users:
+        # If the user exists, return their details
+        return jsonify(users[uid]), 200
+    else:
+        # If the user does not exist, return an error message
+        return jsonify({"error": "User not found"}), 404
+
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()

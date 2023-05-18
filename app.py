@@ -289,12 +289,14 @@ def get_user_details():
     # Get user ID from query parameters
     uid = request.args.get('uid')
 
-    if uid in users:
-        # If the user exists, return their details
-        return jsonify(users[uid]), 200
+    # Query Firestore for user details
+    doc_ref = db.collection('users').document(uid)
+    doc = doc_ref.get()
+    if doc.exists:
+        return jsonify(doc.to_dict()), 200
     else:
-        # If the user does not exist, return an error message
         return jsonify({"error": "User not found"}), 404
+
 
 @app.route('/login', methods=['POST'])
 def login():

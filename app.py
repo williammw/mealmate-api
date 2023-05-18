@@ -410,14 +410,20 @@ def store_message():
     return jsonify({"message": "Message stored successfully"}), 200
 
 
-
 @app.route('/get_messages_for_chat', methods=['POST'])
 def get_messages_for_chat():
     data = request.get_json()
     chat_id = data['chat_id']
-    limit = data['limit']
-    messages = Message.query.filter_by(chat_id=chat_id).order_by(Message.createdAt.desc()).limit(limit).all()
-    return jsonify([message.to_dict() for message in messages])
+    limit = data.get('limit', 100)  # Use a default limit if one is not provided
+
+    # Query Firestore for messages
+    messages_ref = db.collection('messages')
+    messages = messages_ref.where('chat_id', '==', chat_id).order_by('createdAt', direction=firestore.Query.DESCENDING).limit(limit).stream()
+
+    # Convert message documents to dictionaries
+    messages_dicts = [msg.to_dict() for msg in messages]
+
+    return jsonify(messages_dicts)
 
 
 

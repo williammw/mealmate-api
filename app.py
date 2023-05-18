@@ -345,6 +345,22 @@ def is_logged_in():
         return jsonify({"status": "failure", "message": "User is not logged in"}), 401
 
 
+@app.route('/get_chat', methods=['GET'])
+def get_chat():
+    chat_id = request.args.get('chat_id')
+    user_id = request.args.get('user_id')  # Add this line
+    if not chat_id or not user_id:  # Update this line
+        return jsonify({'error': 'Missing chat_id or user_id'}), 400
+
+    chat_ref = db.collection('users').document(user_id).collection('chats').document(chat_id)
+    chat = chat_ref.get()
+    if not chat.exists:
+        return jsonify({'error': 'Chat not found'}), 404
+
+    return jsonify(chat.to_dict()), 200
+
+
+
 @app.route('/get_chats', methods=['POST'])
 def get_chats():
     user_id = request.form.get('user_id')
@@ -361,6 +377,20 @@ def get_chats():
         user_chats.append(chat_data)
 
     return jsonify(user_chats), 200
+
+
+@app.route('/get_chat', methods=['GET'])
+def get_chat():
+    chat_id = request.args.get('chat_id')
+    if not chat_id:
+        return jsonify({'error': 'Missing chat_id'}), 400
+
+    chat_ref = db.collection('users').document(user_id).collection('chats').document(chat_id)
+    chat = chat_ref.get()
+    if not chat.exists:
+        return jsonify({'error': 'Chat not found'}), 404
+
+    return jsonify(chat.to_dict()), 200
 
 
 

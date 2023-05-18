@@ -222,19 +222,18 @@ def verify_security_code():
 def generate_security_code():
     # Implement your code generation logic here
     pass
+import requests
 
 def send_security_code(recipient, security_code, method=None):
-    
     if method == "email":
-        message = Mail(
-            from_email="noreply@yourdomain.com",
-            to_emails=recipient,
-            subject="Your security code",
-            plain_text_content=f"Your security code is: {security_code}",
-        )
         try:
-            sg = SendGridAPIClient(sendgrid_api_key)
-            response = sg.send(message)
+            response = requests.post(
+                "https://api.mailgun.net/v3/your-domain.com/messages",
+                auth=("api", os.environ["MAIL_GUM_API"]),
+                data={"from": "Excited User <mailgun@your-domain.com>",
+                    "to": recipient,
+                    "subject": "Your security code",
+                    "text": f"Your security code is: {security_code}"})
             print("Email sent successfully.")
         except Exception as e:
             print("Error sending email:", e)
@@ -244,7 +243,7 @@ def send_security_code(recipient, security_code, method=None):
             twilio_client = TwilioClient(twilio_account_sid, twilio_auth_token)
             message = twilio_client.messages.create(
                 body=f"Your security code is: {security_code}",
-                from_="+1234567890",  # Replace with your Twilio phone number
+                from_="+85293203871",  # Replace with your Twilio phone number
                 to=recipient,
             )
             print("SMS sent successfully.")
@@ -252,6 +251,7 @@ def send_security_code(recipient, security_code, method=None):
             print("Error sending SMS:", e)
     else:
         print("Invalid method specified.")
+
 
 
 @app.route('/get_user_data', methods=['POST'])

@@ -373,27 +373,63 @@ def get_user_chats():
     return jsonify({'success': True, 'chats': user_chats_list})
 
 
-chats = []  # This will store the chat data
-
-def create_chat(user_id):
-    chat_id = str(uuid.uuid4())
-    chat_data = {
-        'id': chat_id,
-        'user_id': user_id,
-        'messages': [],
-        'timestamp': datetime.utcnow().isoformat(),
-    }
-    db.collection('chats').document(chat_id).set(chat_data)
-    return chat_data
-
-
-
 
 @app.route('/create_new_chat', methods=['POST'])
 def create_new_chat():
     user_id = request.json['user_id']
-    chat_data = create_chat(user_id)
+    chat_id = str(uuid.uuid4())
+    chat_data = {
+        'createdAt': datetime.utcnow(),
+        'updatedAt': datetime.utcnow(),
+        'messages': {}
+    }
+    db.collection('users').document(user_id).collection('chats').document(chat_id).set(chat_data)
     return jsonify({'success': True, 'message': 'New chat created', 'chat': chat_data})
+
+
+@app.route('/add_message', methods=['POST'])
+def add_message():
+    user_id = request.json['user_id']
+    chat_id = request.json['chat_id']
+    message_content = request.json['message_content']
+    message_id = str(uuid.uuid4())
+    message_data = {
+        'messageId': message_id,
+        'createdAt': datetime.utcnow(),
+        'updatedAt': datetime.utcnow(),
+        'type': 'text',  # For simplicity, type is hard-coded as 'text'. You can update this based on your requirements
+        'content': message_content,
+        'sender': 'user',  # For simplicity, sender is hard-coded as 'user'. You can update this based on your requirements
+        'processed': False,
+        'response': {
+            'content': '',
+            'createdAt': None
+        }
+    }
+    chat_ref = db.collection('users').document(user_id).collection('chats').document(chat_id)
+    chat_data = chat_ref.get().to_dict()
+    chat_data['messages'][message_id] = message_data
+    chat_data['updatedAt'] = datetime.utcnow()
+    chat_ref.set(chat_data)
+    return jsonify({'success': True, 'message': 'New message added', 'message': message_data})
+
+
+@app.route('/add_summary', methods=['POST'])
+def add_summary():
+    user_id = request.json['user_id']
+    chat_id = request.json['chat_id']
+    summary_content = request.json['summary_content']
+    summary_id = str(uuid.uuid4())
+    summary_data = {
+        'summaryId': summary_id,
+        'createdAt': datetime.utcnow(),
+        'updatedAt': datetime.utcnow(),
+        'content': summary_content
+    }
+    db.collection('users').document(user_id).collection('chats').document(chat_id).collection('summary').document(summary_id).set(summary_data)
+    return jsonify({'success': True, 'message': 'New summary added', 'summary': summary_data})
+
+
 
 
 @app.route('/store_message', methods=['POST'])

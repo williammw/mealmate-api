@@ -412,7 +412,7 @@ def create_new_chat():
 
     user_ref = db.collection('users').document(user_id)
     user_ref.update({
-        'currentChatId': chat_id,
+        'current_chat_id': chat_id,
     })
 
     return jsonify({'success': True, 'message': 'New chat created', 'chatId': chat_id, 'chat': chat_data}), 200

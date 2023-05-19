@@ -104,8 +104,9 @@ def get_default_message():
 @app.route("/send_message", methods=["POST"])
 def send_message():
     print(request.data)
-    message = request.json.get("message")
-    language_code = request.json.get("language_code")
+    data = json.loads(request.data)
+    message = data.get("message")
+    language_code = data.get("language_code")
 
     if not message or not language_code:
         return jsonify({"error": "Missing message or language_code"}), 400

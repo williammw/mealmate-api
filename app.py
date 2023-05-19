@@ -433,7 +433,9 @@ def store_message():
         db.collection('users').document(user_id).collection('chats').document(chat_id).collection('messages').add(message)
         return jsonify({"success": "Message stored successfully"}), 200
     except Exception as e:
+        print(f"Failed to store message. Error: {str(e)}")  # Log the error
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/update_user_details', methods=['PUT'])
 def update_user_details():

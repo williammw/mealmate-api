@@ -418,6 +418,23 @@ def create_new_chat():
     return jsonify({'success': True, 'message': 'New chat created', 'chatId': chat_id, 'chat': chat_data}), 200
 
 
+@app.route("/store_message", methods=["POST"])
+def store_message():
+    data = request.get_json()
+
+    user_id = data.get("user_id")
+    chat_id = data.get("chat_id")
+    message = data.get("message")
+
+    if not user_id or not chat_id or not message:
+        return jsonify({"error": "Missing user_id, chat_id, or message"}), 400
+
+    try:
+        db.collection('users').document(user_id).collection('chats').document(chat_id).collection('messages').add(message)
+        return jsonify({"success": "Message stored successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/update_user_details', methods=['PUT'])
 def update_user_details():
     user_id = request.json['user_id']
@@ -480,48 +497,48 @@ def add_summary():
 
 
 
-@app.route('/store_message', methods=['POST'])
-def store_message():
-    print('/store_message')
-    message_data = request.get_json()
+# @app.route('/store_message', methods=['POST'])
+# def store_message():
+#     print('/store_message')
+#     message_data = request.get_json()
 
-    required_fields = ['id', 'chatId', 'senderId', 'content', 'type', 'status', 'timestamp']
-    if not all(field in message_data for field in required_fields):
-        return jsonify({"error": "Missing one or more required fields"}), 400
+#     required_fields = ['id', 'chatId', 'senderId', 'content', 'type', 'status', 'timestamp']
+#     if not all(field in message_data for field in required_fields):
+#         return jsonify({"error": "Missing one or more required fields"}), 400
 
-    db = firestore.Client()
+#     db = firestore.Client()
 
-    # Fetch the document that matches the id
-    docs = db.collection('messages').where('id', '==', message_data['id']).stream()
+#     # Fetch the document that matches the id
+#     docs = db.collection('messages').where('id', '==', message_data['id']).stream()
 
-    # If the document exists, update it with the new message
-    for doc in docs:
-        doc_ref = db.collection('messages').document(doc.id)
-        doc_ref.update({
-            'chatId': message_data['chatId'],
-            'senderId': message_data['senderId'],
-            'content': message_data['content'],
-            'type': message_data['type'],
-            'status': message_data['status'],
-            'attachments': message_data.get('attachments', []),
-            'timestamp': message_data['timestamp']
-        })
-        return jsonify({"message": "Message updated successfully"}), 200
+#     # If the document exists, update it with the new message
+#     for doc in docs:
+#         doc_ref = db.collection('messages').document(doc.id)
+#         doc_ref.update({
+#             'chatId': message_data['chatId'],
+#             'senderId': message_data['senderId'],
+#             'content': message_data['content'],
+#             'type': message_data['type'],
+#             'status': message_data['status'],
+#             'attachments': message_data.get('attachments', []),
+#             'timestamp': message_data['timestamp']
+#         })
+#         return jsonify({"message": "Message updated successfully"}), 200
 
-    # If the document does not exist, create a new one
-    doc_ref = db.collection('messages').document()
-    doc_ref.set({
-        'id': message_data['id'],
-        'chatId': message_data['chatId'],
-        'senderId': message_data['senderId'],
-        'content': message_data['content'],
-        'type': message_data['type'],
-        'status': message_data['status'],
-        'attachments': message_data.get('attachments', []),
-        'timestamp': message_data['timestamp']
-    })
+#     # If the document does not exist, create a new one
+#     doc_ref = db.collection('messages').document()
+#     doc_ref.set({
+#         'id': message_data['id'],
+#         'chatId': message_data['chatId'],
+#         'senderId': message_data['senderId'],
+#         'content': message_data['content'],
+#         'type': message_data['type'],
+#         'status': message_data['status'],
+#         'attachments': message_data.get('attachments', []),
+#         'timestamp': message_data['timestamp']
+#     })
 
-    return jsonify({"message": "Message stored successfully"}), 200
+#     return jsonify({"message": "Message stored successfully"}), 200
 
 
 @app.route('/get_messages_for_chat', methods=['POST'])

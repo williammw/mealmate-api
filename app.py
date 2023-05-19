@@ -411,6 +411,23 @@ def create_new_chat():
     return jsonify({'success': True, 'message': 'New chat created', 'chatId': chat_id, 'chat': chat_data}), 200
 
 
+@app.route('/update_user_details', methods=['PUT'])
+def update_user_details():
+    user_id = request.json['user_id']
+    user_details = request.json['user_details']
+
+    user_ref = db.collection('users').document(user_id)
+
+    # First, check if the user exists
+    if not user_ref.get().exists:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Update the user's details
+    user_ref.update(user_details)
+
+    return jsonify({'success': True, 'message': 'User details updated'})
+
+
 @app.route('/add_message', methods=['POST'])
 def add_message():
     user_id = request.json['user_id']

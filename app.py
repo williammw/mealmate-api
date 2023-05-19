@@ -103,6 +103,7 @@ def get_default_message():
 
 @app.route("/send_message", methods=["POST"])
 def send_message():
+    print(request.data)
     message = request.json.get("message")
     language_code = request.json.get("language_code")
 

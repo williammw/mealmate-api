@@ -98,13 +98,15 @@ def get_default_message():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+from flask import Flask, request, jsonify
+import openai
+import json
 
 
 
 @app.route("/send_message", methods=["POST"])
 def send_message():
-    print(request.data)
-    data = json.loads(request.data)
+    data = request.json
     message = data.get("message")
     language_code = data.get("language_code")
 
@@ -112,20 +114,23 @@ def send_message():
         return jsonify({"error": "Missing message or language_code"}), 400
 
     language_prompt = PROMPTS.get(language_code, PROMPTS["en"])
-    full_prompt = f"{language_prompt}\n\nUser: {message}"
+
+    messages = [
+        {"role": "system", "content": language_prompt},
+        {"role": "user", "content": message}
+    ]
 
     try:
-        response = openai.Completion.create(
-            engine="gpt-3.5-turbo",
-            prompt=full_prompt,
-            max_tokens=1000,
-            temperature=0.8,
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=messages
         )
-        response_text = response.choices[0].text.strip()
+        response_text = response['choices'][0]['message']['content'].strip()
+        print(response_text)
         return jsonify({"response": response_text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
 
 
 @app.route('/signup', methods=['POST'])

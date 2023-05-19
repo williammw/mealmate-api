@@ -114,7 +114,7 @@ def send_message():
 
     try:
         response = openai.Completion.create(
-            engine="text-davinci-003",
+            engine="gpt-3.5-turbo",
             prompt=full_prompt,
             max_tokens=1000,
             temperature=0.8,

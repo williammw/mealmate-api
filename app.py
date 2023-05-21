@@ -156,7 +156,8 @@ def signup():
                 phone_number=email_or_phone,
                 password=password
             )
-        
+        # security_code = generate_security_code()
+        security_code = "999999"
         # Add the user data to Firestore
         user_ref = db.collection('users').document(user.uid)
         user_ref.set({
@@ -169,8 +170,7 @@ def signup():
         })
 
         # Send a security code to the user (via email or SMS)
-        # security_code = generate_security_code()
-        security_code = "999999"
+        
         if '@' in email_or_phone:
             send_security_code(email_or_phone, security_code, method="email")
         else:
@@ -191,10 +191,13 @@ def signup():
 def save_user_data():
     email = request.form.get('email')
     security_code = request.form.get('security_code')
+    uid = request.form.get('auth_token')
+
+    user_ref = db.collection('users').document(uid)
 
     # Save the user data to Firestore
-    user_ref = db.collection('users').add({
-        'email': email,
+    user_ref = db.collection('users').update({
+        # 'email': email,
         'security_code': security_code
     })
 

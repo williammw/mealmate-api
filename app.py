@@ -196,7 +196,7 @@ def save_user_data():
     user_ref = db.collection('users').document(uid)
 
     # Save the user data to Firestore
-    user_ref = db.collection('users').update({
+    user_ref.update({
         # 'email': email,
         'security_code': security_code
     })

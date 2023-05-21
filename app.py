@@ -214,8 +214,9 @@ def verify_security_code():
     print(f"User Input Security Code: {user_input_security_code}")
 
 
-    # Get the user data from Firestore
-    user_ref = db.collection('users').where('email', '==', email).get()
+    # Get the user data from Firestore    
+    user_ref = db.collection('users').where(field_path='email', op_string='==', value=email).get()
+
 
     if user_ref:
         print(f"User Data: {user_ref[0].to_dict()}")

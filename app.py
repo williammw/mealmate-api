@@ -573,10 +573,10 @@ def get_messages_for_chat():
 
 @app.route("/")
 def home():
-    return "<h1>MealMate(temp) 0.0.9</h1>"
+    return "<h1>MealMate(temp) 0.0.10</h1>"
 
 
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=5001, ssl_context=('server.crt', 'server.key'), debug=True)
+    app.run(debug=True)
 

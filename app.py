@@ -209,16 +209,19 @@ def save_user_data():
 def verify_security_code():
     email = request.form.get('email')
     user_input_security_code = request.form.get('security_code')
+    uid = request.form.get('auth_token')
 
     # Get the user data from Firestore
-    user_ref = db.collection('users').where('email', '==', email).get()
+    # user_ref = db.collection('users').where('email', '==', email).get()
+    user_doc = db.collection('users').document(uid)
 
     print(f"Email: {email}")
     print(f"User Input Security Code: {user_input_security_code}")
 
-    if user_ref:
-        print(f"User Data: {user_ref[0].to_dict()}")
-        stored_security_code = user_ref[0].to_dict().get('security_code')
+    if user_doc.exists:
+        user_data = user_doc.to_dict()
+        print(f"User Data: {user_data}")
+        stored_security_code = user_data.get('security_code')
         print(f"Stored security code: {stored_security_code}")
 
         if user_input_security_code == stored_security_code:

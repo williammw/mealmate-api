@@ -51,3 +51,9 @@ The MealMate app API endpoint will be developed using the Flask framework. It wi
 
 - Document API usage, including endpoint descriptions, request and response examples, and error codes.
 - Provide setup and deployment instructions for developers.
+
+
+## fake env
+```
+source ~/.venvs/mealmate/bin/activate
+```

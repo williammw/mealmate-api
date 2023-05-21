@@ -169,7 +169,8 @@ def signup():
         })
 
         # Send a security code to the user (via email or SMS)
-        security_code = generate_security_code()
+        # security_code = generate_security_code()
+        security_code = "999999"
         if '@' in email_or_phone:
             send_security_code(email_or_phone, security_code, method="email")
         else:
@@ -568,5 +569,6 @@ def home():
 
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(host='localhost', port=5001, ssl_context=('server.crt', 'server.key'), debug=True)
+

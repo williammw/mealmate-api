@@ -212,16 +212,15 @@ def verify_security_code():
 
     # Get the user data from Firestore
     user_ref = db.collection('users').where('email', '==', email).get()
-    
+
     print(f"Email: {email}")
     print(f"User Input Security Code: {user_input_security_code}")
-    print(f"stored_security {user_ref[0].to_dict().get('security_code')}")
 
-    # print(f"stored_s {user_ref[0].to_dict().get('security_code')}")
     if user_ref:
         print(f"User Data: {user_ref[0].to_dict()}")
         stored_security_code = user_ref[0].to_dict().get('security_code')
-        print(f" stored security code {stored_security_code}")
+        print(f"Stored security code: {stored_security_code}")
+
         if user_input_security_code == stored_security_code:
             # Verification successful
             return jsonify({"message": "Security code verified successfully"}), 200
@@ -229,7 +228,9 @@ def verify_security_code():
             # Verification failed
             return jsonify({"error": "Invalid security code"}), 400
     else:
+        print("User not found in database.")
         return jsonify({"error": "User data not found"}), 404
+
 
 def generate_security_code():
     # Implement your code generation logic here

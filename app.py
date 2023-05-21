@@ -220,7 +220,7 @@ def verify_security_code():
     if user_ref:
         print(f"User Data: {user_ref[0].to_dict()}")
         stored_security_code = user_ref[0].to_dict().get('security_code')
-
+        print(f" stored security code {stored_security_code}")
         if user_input_security_code == stored_security_code:
             # Verification successful
             return jsonify({"message": "Security code verified successfully"}), 200

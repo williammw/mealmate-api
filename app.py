@@ -167,6 +167,9 @@ def signup():
             'date_of_birth': date_of_birth,
             'people_dining': people_dining,
             'bio': '',
+            'avatar_url':'',
+            'current_chat_id' : '',
+            'userId': '',
         })
 
         # Send a security code to the user (via email or SMS)

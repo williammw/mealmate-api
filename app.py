@@ -557,24 +557,55 @@ def add_summary():
 
 @app.route('/get_messages_for_chat', methods=['POST'])
 def get_messages_for_chat():
+    print("Inside get_messages_for_chat")  # Add this line
     data = request.get_json()
     chat_id = data['chat_id']
     user_id = data['user_id']
     limit = data.get('limit', 40)  # Default limit is 40
+    print(f"data: {data}")
+    print(f"chat_id: {chat_id}")
+    print(f"user_id: {user_id}")
+    print(f"limit: {limit}")
+    try:
+        # Query Firestore for all messages in a chat
+        messages_ref = db.collection('users').document(user_id).collection('chats').document(chat_id).collection('messages')
+        messages_query = messages_ref.order_by('created_at', direction=firestore.Query.DESCENDING).limit(limit)
+        messages = messages_query.stream()
+
+        messages_list = [msg.to_dict() for msg in messages]
+
+        if messages_list:
+            return jsonify(messages_list), 200
+        else:
+            return jsonify({'message': 'No messages found'}), 404
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+
+@app.route('/get_messages_for_chat_v2', methods=['GET'])
+def get_messages_for_chat_v2():
+    chat_id = request.args.get('chat_id')
+    user_id = request.args.get('user_id')
 
     # Query Firestore for all messages in a chat
     messages_ref = db.collection('users').document(user_id).collection('chats').document(chat_id).collection('messages')
-    messages_query = messages_ref.order_by('createdAt', direction=firestore.Query.DESCENDING).limit(limit)
-    messages = messages_query.stream()
+    messages = messages_ref.stream()
 
-    messages_list = [msg.to_dict() for msg in messages]
+    messages_list = []
+    for message in messages:
+        messages_list.append(message.to_dict())
 
     if messages_list:
         return jsonify(messages_list), 200
     else:
         return jsonify({'message': 'No messages found'}), 404
 
-
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 

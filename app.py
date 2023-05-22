@@ -451,19 +451,29 @@ def store_message():
 
 @app.route('/update_user_details', methods=['PUT'])
 def update_user_details():
-    user_id = request.json['user_id']
-    user_details = request.json['user_details']
+    data = request.get_json()
 
-    user_ref = db.collection('users').document(user_id)
+    if 'user_id' in data and 'user_details' in data:
+        user_id = data['user_id']
+        user_details = data['user_details']
 
-    # First, check if the user exists
-    if not user_ref.get().exists:
-        return jsonify({'error': 'User not found'}), 404
+        # Check if user_details contains 'preferredLanguage' field
+        if 'preferredLanguage' not in user_details:
+            return jsonify({'error': 'Missing preferredLanguage in user details'}), 400
 
-    # Update the user's details
-    user_ref.update(user_details)
+        user_ref = db.collection('users').document(user_id)
 
-    return jsonify({'success': True, 'message': 'User details updated'})
+        # First, check if the user exists
+        if not user_ref.get().exists:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Update the user's details
+        user_ref.update(user_details)
+
+        return jsonify({'success': True, 'message': 'User details updated'}), 200
+    else:
+        return jsonify({'error': 'Missing user_id or user_details in request data'}), 400
+
 
 
 @app.route('/add_message', methods=['POST'])

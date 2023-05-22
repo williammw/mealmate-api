@@ -555,24 +555,28 @@ def add_summary():
 #     return jsonify({"message": "Message stored successfully"}), 200
 
 
-
 @app.route('/get_messages_for_chat', methods=['POST'])
 def get_messages_for_chat():
-    chat_id = request.args.get('chat_id')
-    user_id = request.args.get('user_id')
+    data = request.get_json()
+    chat_id = data['chat_id']
+    user_id = data['user_id']
+    limit = data.get('limit', 40)  # Default limit is 40
 
     # Query Firestore for all messages in a chat
     messages_ref = db.collection('users').document(user_id).collection('chats').document(chat_id).collection('messages')
-    messages = messages_ref.stream()
+    messages_query = messages_ref.order_by('createdAt', direction=firestore.Query.DESCENDING).limit(limit)
+    messages = messages_query.stream()
 
-    messages_list = []
-    for message in messages:
-        messages_list.append(message.to_dict())
+    messages_list = [msg.to_dict() for msg in messages]
 
     if messages_list:
         return jsonify(messages_list), 200
     else:
         return jsonify({'message': 'No messages found'}), 404
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

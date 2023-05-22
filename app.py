@@ -614,20 +614,10 @@ def get_messages_for_chat_v2():
     else:
         return jsonify({'message': 'No messages found'}), 404
 
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
-
 
 @app.route("/")
 def home():
-    return "<h1>MealMate(temp) 0.0.10</h1>"
+    return "<h1>MealMate(temp) 0.1.0</h1>"
 
 
 

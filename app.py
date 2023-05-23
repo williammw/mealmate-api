@@ -421,8 +421,24 @@ def create_new_chat():
         'createdAt': datetime.utcnow(),
         'updatedAt': datetime.utcnow(),
     }
-    db.collection('users').document(user_id).collection('chats').document(chat_id).set(chat_data)
+    # Create the chat
+    chat_ref = db.collection('users').document(user_id).collection('chats').document(chat_id)
+    chat_ref.set(chat_data)
 
+    # Create the initial message
+    message_data = {
+        'chat_id': chat_id,
+        'content': "Hello! How can I assist you today on restaurant menus?",
+        'created_at': datetime.utcnow(),
+        'message_id': "bot",
+        'processed': True,
+        'sender': "bot",
+        'type': "text",
+        'updated_at': datetime.utcnow(),
+    }
+    chat_ref.collection('messages').document().set(message_data)
+
+    # Update the user document
     user_ref = db.collection('users').document(user_id)
     user_ref.update({
         'current_chat_id': chat_id,

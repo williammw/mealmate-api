@@ -170,6 +170,7 @@ def signup():
             'avatar_url':'',
             'current_chat_id' : '',
             'userId': '',
+            'preferred_language' : 'zh-hk',
         })
 
         # Send a security code to the user (via email or SMS)

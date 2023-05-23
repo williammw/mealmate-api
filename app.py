@@ -109,7 +109,8 @@ def send_message():
     data = request.json
     message = data.get("message")
     language_code = data.get("language_code")
-
+    print(message)
+    print(language_code)
     if not message or not language_code:
         return jsonify({"error": "Missing message or language_code"}), 400
 
@@ -126,10 +127,13 @@ def send_message():
             messages=messages
         )
         response_text = response['choices'][0]['message']['content'].strip()
+        
         print(response_text)
         return jsonify({"response": response_text})
     except Exception as e:
+        print(str(e))  # Log the exception
         return jsonify({"error": str(e)}), 500
+
 
 
 

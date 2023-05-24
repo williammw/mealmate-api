@@ -13,6 +13,8 @@ from flask import session
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from twilio.rest import Client as TwilioClient
+
+
 # Generate a random UUID (UUID version 4)
 random_uuid = uuid.uuid4()
 
@@ -97,10 +99,6 @@ def get_default_message():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-from flask import Flask, request, jsonify
-import openai
-import json
 
 
 

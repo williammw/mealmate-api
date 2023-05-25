@@ -13,6 +13,8 @@ from flask import session
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from twilio.rest import Client as TwilioClient
+
+
 # Generate a random UUID (UUID version 4)
 random_uuid = uuid.uuid4()
 
@@ -98,17 +100,15 @@ def get_default_message():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-from flask import Flask, request, jsonify
-import openai
-import json
-
 
 
 @app.route("/send_message", methods=["POST"])
 def send_message():
+    
     data = request.json
     message = data.get("message")
     language_code = data.get("language_code")
+    print("send_message called")
     print(message)
     print(language_code)
     if not message or not language_code:
@@ -126,8 +126,9 @@ def send_message():
             model="gpt-3.5-turbo",
             messages=messages
         )
+        print('try call openAI')
         response_text = response['choices'][0]['message']['content'].strip()
-        
+        print(f'Raw response text: {response}')
         print(response_text)
         return jsonify({"response": response_text})
     except Exception as e:
@@ -145,7 +146,7 @@ def send_message_davinci():
     print(language_code)
     if not message or not language_code:
         return jsonify({"error": "Missing message or language_code"}), 400
-    
+        
     language_prompt = PROMPTS.get(language_code, PROMPTS["en"])
 
     messages = [
@@ -462,8 +463,8 @@ def create_new_chat():
 
     chat_id = str(uuid.uuid4())
     chat_data = {
-        'createdAt': datetime.utcnow(),
-        'updatedAt': datetime.utcnow(),
+        'createdAt': firestore.SERVER_TIMESTAMP,
+        'updatedAt': firestore.SERVER_TIMESTAMP,
     }
     # Create the chat
     chat_ref = db.collection('users').document(user_id).collection('chats').document(chat_id)
@@ -473,12 +474,12 @@ def create_new_chat():
     message_data = {
         'chat_id': chat_id,
         'content': "Hello! How can I assist you today on restaurant menus?",
-        'created_at': datetime.utcnow(),
+        'created_at': firestore.SERVER_TIMESTAMP,
         'message_id': "bot",
         'processed': True,
         'sender': "bot",
         'type': "text",
-        'updated_at': datetime.utcnow(),
+        'updated_at': firestore.SERVER_TIMESTAMP,
     }
     chat_ref.collection('messages').document().set(message_data)
 
@@ -501,8 +502,15 @@ def store_message():
 
     if not user_id or not chat_id or not message:
         return jsonify({"error": "Missing user_id, chat_id, or message"}), 400
+    
+    # Add created_at and updated_at fields
+    now = datetime.datetime.now().isoformat()
+    message['created_at'] = now
+    message['updated_at'] = now
+
 
     try:
+        print(f'storing message {message}');
         db.collection('users').document(user_id).collection('chats').document(chat_id).collection('messages').add(message)
         return jsonify({"success": "Message stored successfully"}), 200
     except Exception as e:
@@ -545,8 +553,8 @@ def add_message():
     message_id = str(uuid.uuid4())
     message_data = {
         'messageId': message_id,
-        'createdAt': datetime.utcnow(),
-        'updatedAt': datetime.utcnow(),
+        'createdAt': firestore.SERVER_TIMESTAMP,
+        'updatedAt': firestore.SERVER_TIMESTAMP,
         'type': 'text',  # For simplicity, type is hard-coded as 'text'. You can update this based on your requirements
         'content': message_content,
         'sender': 'user',  # For simplicity, sender is hard-coded as 'user'. You can update this based on your requirements
@@ -559,7 +567,7 @@ def add_message():
     chat_ref = db.collection('users').document(user_id).collection('chats').document(chat_id)
     chat_data = chat_ref.get().to_dict()
     chat_data['messages'][message_id] = message_data
-    chat_data['updatedAt'] = datetime.utcnow()
+    chat_data['updatedAt'] = firestore.SERVER_TIMESTAMP
     chat_ref.set(chat_data)
     return jsonify({'success': True, 'message': 'New message added', 'message': message_data})
 
@@ -572,8 +580,8 @@ def add_summary():
     summary_id = str(uuid.uuid4())
     summary_data = {
         'summaryId': summary_id,
-        'createdAt': datetime.utcnow(),
-        'updatedAt': datetime.utcnow(),
+        'createdAt': firestore.SERVER_TIMESTAMP,
+        'updatedAt': firestore.SERVER_TIMESTAMP,
         'content': summary_content
     }
     db.collection('users').document(user_id).collection('chats').document(chat_id).collection('summary').document(summary_id).set(summary_data)
@@ -633,7 +641,7 @@ def get_messages_for_chat():
     chat_id = data['chat_id']
     user_id = data['user_id']
     limit = data.get('limit', 40)  # Default limit is 40
-    print(f"data: {data}")
+    # print(f"data: {data}")
     print(f"chat_id: {chat_id}")
     print(f"user_id: {user_id}")
     print(f"limit: {limit}")
@@ -642,6 +650,7 @@ def get_messages_for_chat():
         messages_ref = db.collection('users').document(user_id).collection('chats').document(chat_id).collection('messages')
         messages_query = messages_ref.order_by('created_at', direction=firestore.Query.DESCENDING).limit(limit)
         messages = messages_query.stream()
+        
 
         messages_list = [msg.to_dict() for msg in messages]
 
@@ -654,6 +663,30 @@ def get_messages_for_chat():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/get_message_test', methods=['GET'])
+def get_message():
+    print("Inside get_message")
+    chat_id = request.args.get('chat_id')
+    user_id = request.args.get('user_id')
+    limit = request.args.get('limit', default=40, type=int)
+    print(f"chat_id: {chat_id}")
+    print(f"user_id: {user_id}")
+    print(f"limit: {limit}")
+    try:
+        # Query Firestore for all messages in a chat
+        messages_ref = db.collection('users').document(user_id).collection('chats').document(chat_id).collection('messages')
+        messages_query = messages_ref.order_by('created_at', direction=firestore.Query.DESCENDING) # ASCENDING
+        messages = messages_query.stream()
+
+        messages_list = [msg.to_dict() for msg in messages]
+
+        if messages_list:
+            return jsonify(messages_list), 200
+        else:
+            return jsonify({'message': 'No messages found'}), 404
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 

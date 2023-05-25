@@ -2,7 +2,7 @@ import os
 import openai
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, session,url_for, redirect
-import datetime
+from datetime import datetime
 
 import firebase_admin
 from firebase_admin import credentials, auth, exceptions as firebase_exceptions, firestore
@@ -463,8 +463,8 @@ def create_new_chat():
 
     chat_id = str(uuid.uuid4())
     chat_data = {
-        'createdAt': firestore.SERVER_TIMESTAMP,
-        'updatedAt': firestore.SERVER_TIMESTAMP,
+        'createdAt': datetime.utcnow().isoformat() + 'Z',  # ISO 8601 format
+        'updatedAt': datetime.utcnow().isoformat() + 'Z',  # ISO 8601 format
     }
     # Create the chat
     chat_ref = db.collection('users').document(user_id).collection('chats').document(chat_id)

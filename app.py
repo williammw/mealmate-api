@@ -488,8 +488,8 @@ def create_new_chat():
     user_ref.update({
         'current_chat_id': chat_id,
     })
-    chat_data_dict = chat_data.to_dict()
-    return jsonify({'success': True, 'message': 'New chat created', 'chatId': chat_id, 'chat': chat_data_dict}), 200
+
+    return jsonify({'success': True, 'message': 'New chat created', 'chatId': chat_id, 'chat': chat_data}), 200
 
 
 @app.route("/store_message", methods=["POST"])

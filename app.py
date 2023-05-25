@@ -2,7 +2,7 @@ import os
 import openai
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, session,url_for, redirect
-from datetime import datetime
+import datetime
 
 import firebase_admin
 from firebase_admin import credentials, auth, exceptions as firebase_exceptions, firestore

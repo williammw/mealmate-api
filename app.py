@@ -13,8 +13,6 @@ from flask import session
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from twilio.rest import Client as TwilioClient
-
-
 # Generate a random UUID (UUID version 4)
 random_uuid = uuid.uuid4()
 
@@ -100,6 +98,10 @@ def get_default_message():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+from flask import Flask, request, jsonify
+import openai
+import json
+
 
 
 @app.route("/send_message", methods=["POST"])
@@ -132,6 +134,46 @@ def send_message():
         print(str(e))  # Log the exception
         return jsonify({"error": str(e)}), 500
 
+@app.route("/send_message_davinci", methods=["POST"])
+def send_message_davinci():
+    
+    data = request.json
+    message = data.get("message")
+    language_code = data.get("language_code")
+    print("send_message_davinci called")
+    print(message)
+    print(language_code)
+    if not message or not language_code:
+        return jsonify({"error": "Missing message or language_code"}), 400
+    
+    language_prompt = PROMPTS.get(language_code, PROMPTS["en"])
+
+    messages = [
+        {"role": "system", "content": language_prompt},
+        {"role": "user", "content": message}
+    ]
+
+    conversation_history = "\n".join(f'{msg["role"].title()}: {msg["content"]}' for msg in messages)
+
+    try:
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=conversation_history + "\nAI:",
+            temperature=0.9,
+            max_tokens=1000,
+            top_p=1,
+            frequency_penalty=0.0,
+            presence_penalty=0.6,
+            stop=[" Human:", " AI:"]
+        )
+        print('try call openAI')
+        response_text = response['choices'][0]['text'].strip()
+        print(f'Raw response text: {response}')
+        print(response_text)
+        return jsonify({"response": response_text})
+    except Exception as e:
+        print(str(e))  # Log the exception
+        return jsonify({"error": str(e)}), 500
 
 
 

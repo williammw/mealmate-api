@@ -488,8 +488,8 @@ def create_new_chat():
     user_ref.update({
         'current_chat_id': chat_id,
     })
-
-    return jsonify({'success': True, 'message': 'New chat created', 'chatId': chat_id, 'chat': chat_data}), 200
+    chat_data_dict = chat_data.to_dict()
+    return jsonify({'success': True, 'message': 'New chat created', 'chatId': chat_id, 'chat': chat_data_dict}), 200
 
 
 @app.route("/store_message", methods=["POST"])
@@ -504,9 +504,9 @@ def store_message():
         return jsonify({"error": "Missing user_id, chat_id, or message"}), 400
     
     # Add created_at and updated_at fields
-    now = datetime.datetime.now().isoformat()
-    message['created_at'] = now
-    message['updated_at'] = now
+    # now = datetime.datetime.now().isoformat()
+    message['created_at'] = firestore.SERVER_TIMESTAMP
+    message['updated_at'] = firestore.SERVER_TIMESTAMP
 
 
     try:

@@ -1,17 +1,18 @@
 from flask import Flask, Blueprint, jsonify, request, session
 from twilio.rest import Client as TwilioClient
 import requests
+from firebase_admin import credentials, auth, exceptions as firebase_exceptions, firestore
 from dotenv import load_dotenv
 from umami.lib.cms import initialize_firebase
 import os
 
-auth = Blueprint('auth', __name__)
+appauth = Blueprint('appauth', __name__)
 
 
 load_dotenv()  
 db = initialize_firebase()
 
-@auth.route('/signup', methods=['POST'])
+@appauth.route('/signup', methods=['POST'])
 def signup():
     data = request.json
     print(f'Request data: {data}')
@@ -100,7 +101,7 @@ def send_security_code(recipient, security_code, method=None):
 
 
 
-@auth.route('/verify_security_code', methods=['POST'])
+@appauth.route('/verify_security_code', methods=['POST'])
 def verify_security_code():
     email = request.form.get('email')
     user_input_security_code = request.form.get('security_code')
@@ -133,7 +134,7 @@ def verify_security_code():
 
 
 
-@auth.route('/login', methods=['POST'])
+@appauth.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     email = data.get("email")
@@ -157,7 +158,7 @@ def login():
     except Exception as e:
         return jsonify({"status": "failure", "message": str(e)}), 400
 
-@auth.route('/logout', methods=['POST'])
+@appauth.route('/logout', methods=['POST'])
 def logout():
     if 'user_id' in session:
         session.pop('user_id', None)
@@ -165,7 +166,7 @@ def logout():
     else:
         return jsonify({"status": "failure", "message": "No user logged in"}), 400
 
-@auth.route('/is_logged_in', methods=['POST'])
+@appauth.route('/is_logged_in', methods=['POST'])
 def is_logged_in():
     id_token = request.json.get("idToken")
 

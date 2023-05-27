@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, jsonify, request
+from flask import Flask, Blueprint, jsonify, request, session
 from twilio.rest import Client as TwilioClient
 import requests
 from dotenv import load_dotenv
@@ -9,7 +9,7 @@ auth = Blueprint('auth', __name__)
 
 
 load_dotenv()  
-# db = initialize_firebase()
+db = initialize_firebase()
 
 @auth.route('/signup', methods=['POST'])
 def signup():

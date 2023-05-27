@@ -6,4 +6,5 @@
 mealmate-b3b1e-firebase-adminsdk-2zswv-80d20193b0.json
 /new_venv
 /venv
-
+.DS_Store
+/.DS_Store

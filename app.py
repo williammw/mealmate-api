@@ -17,6 +17,7 @@ from umami.lib.cms import initialize_firebase
 from umami.lib.api import api
 from umami.lib.cms import cms
 from umami.lib.appauth import appauth
+from umami.lib.cdn import cdn
 
 # Generate a random UUID (UUID version 4)
 random_uuid = uuid.uuid4()
@@ -31,6 +32,7 @@ app = Flask(__name__)
 app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(cms, url_prefix='/cms')
 app.register_blueprint(appauth, url_prefix='/appauth')
+app.register_blueprint(cdn, url_prefix='/cdn')
 
 openai.api_key = os.environ["OPENAI_API_KEY"]
 app.secret_key = os.environ["FLASK_SECRET_KEY"]

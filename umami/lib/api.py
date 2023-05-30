@@ -56,40 +56,41 @@ def get_default_message():
 
 
 
-@api.route("/send_message", methods=["POST"])
-def send_message():
+# @api.route("/send_message", methods=["POST"])
+# def send_message():
     
-    data = request.json
-    message = data.get("message")
-    language_code = data.get("language_code")
-    print("send_message called")
-    print(message)
-    print(language_code)
-    if not message or not language_code:
-        return jsonify({"error": "Missing message or language_code"}), 400
+#     data = request.json
+#     message = data.get("message")
+#     language_code = data.get("language_code")
+#     print("send_message called")
+#     print(message)
+#     print(language_code)
+#     if not message or not language_code:
+#         return jsonify({"error": "Missing message or language_code"}), 400
 
-    language_prompt = PROMPTS.get(language_code, PROMPTS["en"])
+#     language_prompt = PROMPTS.get(language_code, PROMPTS["en"])
 
-    messages = [
-        {"role": "system", "content": language_prompt},
-        {"role": "user", "content": message}
-    ]
+#     messages = [
+#         {"role": "system", "content": language_prompt},
+#         {"role": "user", "content": message}
+#     ]
 
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages
-        )
-        print('try call openAI')
-        response_text = response['choices'][0]['message']['content'].strip()
-        print(f'Raw response text: {response}')
-        print(response_text)
-        return jsonify({"response": response_text})
-    except Exception as e:
-        print(str(e))  # Log the exception
-        return jsonify({"error": str(e)}), 500
+#     try:
+#         response = openai.ChatCompletion.create(
+#             model="gpt-3.5-turbo",
+#             messages=messages
+#         )
+#         print('try call openAI')
+#         response_text = response['choices'][0]['message']['content'].strip()
+#         print(f'Raw response text: {response}')
+#         print(response_text)
+#         return jsonify({"response": response_text})
+#     except Exception as e:
+#         print(str(e))  # Log the exception
+#         return jsonify({"error": str(e)}), 500
 
-@api.route("/send_message_davinci", methods=["POST"])
+# it was davinci before
+@api.route("/send_message", methods=["POST"])
 def send_message_davinci():
     
     data = request.json

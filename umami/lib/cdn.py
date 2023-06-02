@@ -95,3 +95,16 @@ def verify_token():
         return jsonify({"error": "Failed to verify token"}), response.status_code
     
     return jsonify(response.json())
+
+
+# list videos
+@cdn.route('/list_videos', methods=['GET'])
+def get_videos():
+    url = f"https://api.cloudflare.com/client/v4/accounts/{os.environ['CLOUDFLARE_IMAGES_ACCOUNT_ID']}/stream"
+    headers = {'Authorization': os.environ["CLOUD_FLARE_STREAM_AND_IMAGES_API_TOKEN"]}
+    response = requests.get(url, headers=headers)
+    print(response.text)  # Add this line to print the response to the console
+    if response.status_code == 200:
+        return jsonify(response.json()), 200
+    else:
+        return jsonify(response.json()), response.status_code
